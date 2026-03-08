@@ -9,6 +9,7 @@ import {
 } from "@/lib/firestore";
 import type { ProfileData, Skill, Project, SocialLink } from "@/lib/firestore";
 import { LogOut, Plus, Trash2, Save, Edit2, X, Upload } from "lucide-react";
+import AnimationSettingsEditor from "@/components/AnimationSettingsEditor";
 
 // ─── Login ───
 const LoginForm = ({ onLogin }: { onLogin: () => void }) => {
@@ -263,8 +264,8 @@ const ProjectManager = ({ projects: initialProjects, onUpdate }: { projects: Pro
     onUpdate();
   };
 
-  const ProjectForm = ({ data, onChange, onImageUpload, imageTarget }: {
-    data: Omit<Project, "id">; onChange: (d: any) => void; onImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void; imageTarget: string;
+  const ProjectForm = ({ data, onChange, onImageUpload }: {
+    data: Omit<Project, "id">; onChange: (d: any) => void; onImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   }) => (
     <div className="space-y-3">
       <input placeholder="Title" value={data.title} onChange={e => onChange({ ...data, title: e.target.value })}
@@ -295,7 +296,7 @@ const ProjectManager = ({ projects: initialProjects, onUpdate }: { projects: Pro
       {showAdd && (
         <div className="glass rounded-2xl p-6 space-y-4">
           <ProjectForm data={newProject} onChange={setNewProject}
-            onImageUpload={(e) => handleImageUpload(e, "new")} imageTarget="new" />
+            onImageUpload={(e) => handleImageUpload(e, "new")} />
           <div className="flex gap-2">
             <button onClick={handleAdd} className="flex items-center gap-2 glass neon-glow rounded-full px-6 py-2 text-primary"><Save size={16} /> Save</button>
             <button onClick={() => setShowAdd(false)} className="rounded-full px-4 py-2 text-muted-foreground text-sm">Cancel</button>
@@ -312,7 +313,6 @@ const ProjectManager = ({ projects: initialProjects, onUpdate }: { projects: Pro
                   data={p}
                   onChange={(d) => setProjects(projects.map(pr => pr.id === p.id ? { ...pr, ...d } : pr))}
                   onImageUpload={(e) => handleImageUpload(e, p.id!)}
-                  imageTarget={p.id!}
                 />
                 <div className="flex gap-2">
                   <button onClick={() => handleUpdate(p.id!)} className="flex items-center gap-2 glass neon-glow rounded-full px-6 py-2 text-sm text-primary"><Save size={16} /> Save</button>
@@ -341,7 +341,7 @@ const ProjectManager = ({ projects: initialProjects, onUpdate }: { projects: Pro
 const Admin = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<"profile" | "social" | "skills" | "projects">("profile");
+  const [tab, setTab] = useState<"profile" | "social" | "skills" | "projects" | "animations">("profile");
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [skills, setSkills] = useState<Skill[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
@@ -377,6 +377,7 @@ const Admin = () => {
     { key: "social" as const, label: "Social" },
     { key: "skills" as const, label: "Skills" },
     { key: "projects" as const, label: "Projects" },
+    { key: "animations" as const, label: "✨ Animations" },
   ];
 
   return (
@@ -394,7 +395,7 @@ const Admin = () => {
         <div className="mb-8 flex gap-2 overflow-x-auto">
           {tabs.map(t => (
             <button key={t.key} onClick={() => setTab(t.key)}
-              className={`rounded-full px-6 py-2 text-sm font-medium transition-all ${tab === t.key ? "glass neon-glow text-primary" : "text-muted-foreground hover:text-foreground"}`}>
+              className={`rounded-full px-6 py-2 text-sm font-medium transition-all whitespace-nowrap ${tab === t.key ? "glass neon-glow text-primary" : "text-muted-foreground hover:text-foreground"}`}>
               {t.label}
             </button>
           ))}
@@ -405,6 +406,7 @@ const Admin = () => {
           {tab === "social" && <SocialEditor links={socialLinks} onSave={loadData} />}
           {tab === "skills" && <SkillsManager skills={skills} onUpdate={loadData} />}
           {tab === "projects" && <ProjectManager projects={projects} onUpdate={loadData} />}
+          {tab === "animations" && <AnimationSettingsEditor />}
         </motion.div>
       </div>
     </div>

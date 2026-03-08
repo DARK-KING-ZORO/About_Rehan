@@ -1,3 +1,7 @@
+/**
+ * Portfolio Index — Wraps everything in AnimationSettingsProvider.
+ * Includes GlowCursor for enhanced UX.
+ */
 import { useEffect, useState } from "react";
 import LoadingScreen from "@/components/LoadingScreen";
 import Navbar from "@/components/Navbar";
@@ -7,6 +11,8 @@ import Skills from "@/components/Skills";
 import Projects from "@/components/Projects";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
+import GlowCursor from "@/components/GlowCursor";
+import { AnimationSettingsProvider } from "@/lib/animation-settings";
 import { getProfile, getSkills, getProjects, getSocialLinks } from "@/lib/firestore";
 import type { ProfileData, Skill, Project, SocialLink } from "@/lib/firestore";
 
@@ -34,8 +40,9 @@ const Index = () => {
   }, []);
 
   return (
-    <>
+    <AnimationSettingsProvider>
       <LoadingScreen />
+      <GlowCursor />
       <Navbar />
       <main>
         <Hero profile={profile} />
@@ -45,7 +52,7 @@ const Index = () => {
         <Contact socialLinks={socialLinks} />
       </main>
       <Footer />
-    </>
+    </AnimationSettingsProvider>
   );
 };
 
