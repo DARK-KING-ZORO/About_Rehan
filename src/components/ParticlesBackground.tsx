@@ -1,11 +1,14 @@
-import { useCallback, useMemo } from "react";
-import Particles from "@tsparticles/react";
+import { useEffect, useMemo, useState } from "react";
+import Particles, { initParticlesEngine } from "@tsparticles/react";
 import { loadSlim } from "tsparticles-slim";
-import type { Engine } from "tsparticles-engine";
 
 const ParticlesBackground = () => {
-  const particlesInit = useCallback(async (engine: Engine) => {
-    await loadSlim(engine);
+  const [init, setInit] = useState(false);
+
+  useEffect(() => {
+    initParticlesEngine(async (engine) => {
+      await loadSlim(engine as any);
+    }).then(() => setInit(true));
   }, []);
 
   const options = useMemo(() => ({
@@ -14,8 +17,8 @@ const ParticlesBackground = () => {
     fpsLimit: 60,
     interactivity: {
       events: {
-        onHover: { enable: true, mode: "grab" },
-        onClick: { enable: true, mode: "push" },
+        onHover: { enable: true, mode: "grab" as const },
+        onClick: { enable: true, mode: "push" as const },
       },
       modes: {
         grab: { distance: 140, links: { opacity: 0.5 } },
@@ -45,10 +48,11 @@ const ParticlesBackground = () => {
     detectRetina: true,
   }), []);
 
+  if (!init) return null;
+
   return (
     <Particles
       id="tsparticles"
-      init={particlesInit}
       options={options as any}
       className="absolute inset-0 z-0"
     />
