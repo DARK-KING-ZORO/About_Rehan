@@ -1,5 +1,5 @@
 /**
- * Skills Section — Enhanced with scroll reveal, 3D tilt cards, and optional SkillSphere.
+ * Skills Section — Enhanced with scroll reveal, 3D tilt cards, parallax layers, and optional SkillSphere.
  */
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
@@ -7,6 +7,7 @@ import type { Skill } from "@/lib/firestore";
 import { use3DTilt } from "@/hooks/use3DTilt";
 import { ScrollReveal } from "@/hooks/useScrollReveal";
 import SkillSphere from "./SkillSphere";
+import ParallaxLayer from "./ParallaxLayer";
 
 interface SkillsProps {
   skills: Skill[];
@@ -66,8 +67,18 @@ const Skills = ({ skills }: SkillsProps) => {
   ] as Skill[];
 
   return (
-    <section id="skills" className="py-24 px-6" ref={ref}>
-      <div className="container mx-auto max-w-5xl">
+    <section id="skills" className="relative py-24 px-6 overflow-hidden" ref={ref}>
+      {/* Parallax background orbs for depth */}
+      <ParallaxLayer depth={0.7} className="absolute inset-0 pointer-events-none z-0">
+        <div className="absolute -top-10 right-10 h-80 w-80 rounded-full bg-secondary/5 blur-3xl" />
+        <div className="absolute bottom-20 -left-20 h-64 w-64 rounded-full bg-primary/5 blur-3xl" />
+      </ParallaxLayer>
+
+      <ParallaxLayer depth={0.35} className="absolute inset-0 pointer-events-none z-0">
+        <div className="absolute top-1/3 right-1/4 h-48 w-48 rounded-full bg-accent/4 blur-2xl" />
+      </ParallaxLayer>
+
+      <div className="container mx-auto max-w-5xl relative z-10">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -77,16 +88,19 @@ const Skills = ({ skills }: SkillsProps) => {
           Skills & Technologies
         </motion.h2>
 
-        {/* 3D Skill Sphere */}
-        <div className="mb-16">
+        {/* 3D Skill Sphere — floats at a medium parallax depth */}
+        <ParallaxLayer depth={0.25} className="mb-16">
           <SkillSphere skills={displaySkills} />
-        </div>
+        </ParallaxLayer>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {displaySkills.map((skill, i) => (
-            <SkillCard key={skill.id || i} skill={skill} index={i} />
-          ))}
-        </div>
+        {/* Skill cards on a lighter parallax layer */}
+        <ParallaxLayer depth={0.1}>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {displaySkills.map((skill, i) => (
+              <SkillCard key={skill.id || i} skill={skill} index={i} />
+            ))}
+          </div>
+        </ParallaxLayer>
       </div>
     </section>
   );
